@@ -57,8 +57,8 @@ Users can access the route history, stop report, and zone report pages without l
 
 
 # To Setup:
-1. git clone <repository-url>
-2. cd <project-directory>
+1. git clone `repository-url`
+2. cd `project-directory`
 3. Run
 composer install
 4. Configure .env file
