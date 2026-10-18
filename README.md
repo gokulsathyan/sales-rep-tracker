@@ -1,58 +1,76 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+Sales Rep Location Tracker
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+# Overview
 
-## About Laravel
+This project is built using Laravel to track the locations of field sales representatives during their working hours.
+The application collects GPS locations through the browser and saves them to the database. If the internet connection is unavailable, the locations are stored in the browser and synced with the server when the connection is back.
+It also includes a route history page with a map and reports to check the areas covered by a representative.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+To track locations, users must first register and log in. Once logged in, they can open the location tracking page and start tracking their locations.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+Users can access the route history, stop report, and zone report pages without logging in. These pages are available to guest users.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## Tech Stack
 
-## Learning Laravel
+1. Backend: PHP, Laravel
+2. Database: MySQL
+3. Frontend: Laravel Blade, JavaScript, jQuery
+4. Maps: Leaflet and OpenStreetMap
+5. Authentication: Laravel session authentication and Sanctum
+6. Offline Storage: IndexedDB (for location tracking)
+7. Location Tracking: Browser Geolocation API
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+## Steps
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+### Location Tracking
+1. Users must register and log in to access the location tracking page.
+2. Click Start Tracking to begin tracking. Locations are saved when movement is detected while the browser page is active.
+3. If the browser page becomes inactive and is later active again, location tracking resumes automatically and new locations are saved when movement is detected.
+4. Click Stop Tracking to stop tracking and save the final location.
 
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
+#### How location tracking works:
+1. Before sending a location to the server, it is stored in IndexedDB in the browser.
+2. If the internet is unavailable or an upload fails, the pending locations stay in the local queue until they can be synced.
+3. The application retries syncing when the internet connection comes back, when the page becomes active again, and periodically while the page is running.
+4. Locations are sent to the server in batches of up to 100 records.
+5. After the server confirms that the records have been handled successfully, they are removed from the local queue.
+6. Each location has a unique event ID to prevent the duplicates when a request is retried.
 
-## Agentic Development
+## Route History and Reports
 
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+### Route history
+1. Go to home page >> click Route history and reports.
+2. To check the movement of representative - select representative and date in route history page and click load route.
+3. Corresponding locations will be marked in the map.
+4. Complete timeline of that representative for that day will be listed below the map.
 
-```bash
-composer require laravel/boost --dev
+### Stop Report
+1. Go to stop report page.
+2. Select represntative and date and click load stop report.
+3. Details of representative who remained within a 50 metres radius for more than 15 minutes will be listed.
 
-php artisan boost:install
-```
+### Zone Report
+1. Go to Zone report page.
+2. Choose the date.
+3. Click on the polygon shape in the map and draw the zone. Click on each point to start drawing and double click on a point to stop drawing.
+4. Click Load zone report button to list all the representatives who entered that zone for the selected date.
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
 
-## Contributing
+# To Setup:
+1. git clone <repository-url>
+2. cd <project-directory>
+3. Run
+composer install
+4. Configure .env file
+5. Generate the application key:
+php artisan key:generate
+6. Create database and configure it in .env file
+7. Run migrations
+php artisan migrate
+8. Run 
+npm install
+npm run build
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
 
-## Code of Conduct
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
-
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
-
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+**Note:** Migration files are included in the project. After creating the database and configuring the database credentials in your `.env` file, run `php artisan migrate` to create the required tables.
